@@ -1,22 +1,31 @@
 <?php
 
-global $pdo;
+
 require __DIR__ . '/inc/functions.inc.php';
 require __DIR__ . '/inc/db-connect.inc.php';
 
-if(!empty($_POST)){
-    $title = (string) $_POST['title'] ?? '';
-    $date = (string) $_POST['date'] ?? '';
-    $message = (string) $_POST['message'] ?? '';
-};
 
-$stmt = $pdo->prepare('INSERT INTO `entries`(`title`, `date`, `message`) VALUES (:title, :date, :message)');
-$stmt->bindValue(':title', $title);
-$stmt->bindValue(':date', $date);
-$stmt->bindValue(':message', $message);
-$stmt->execute();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING) ?? '';
+    $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING) ?? '';
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING) ?? '';
 
+    if ($title && $date && $message) {
+        $stmt = $pdo->prepare('INSERT INTO `entries`(`title`, `date`, `message`) VALUES (:title, :date, :message)');
+        $stmt->bindValue(':title', $title);
+        $stmt->bindValue(':date', $date);
+        $stmt->bindValue(':message', $message);
 
+        try {
+            $stmt->execute();
+            echo "New entry added successfully.";
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    } else {
+        echo "Please fill in all fields.";
+    }
+}
 ?>
 
 
