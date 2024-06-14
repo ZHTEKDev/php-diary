@@ -1,7 +1,29 @@
+<?php
+
+global $pdo;
+require __DIR__ . '/inc/functions.inc.php';
+require __DIR__ . '/inc/db-connect.inc.php';
+
+if(!empty($_POST)){
+    $title = (string) $_POST['title'] ?? '';
+    $date = (string) $_POST['date'] ?? '';
+    $message = (string) $_POST['message'] ?? '';
+};
+
+$stmt = $pdo->prepare('INSERT INTO `entries`(`title`, `date`, `message`) VALUES (:title, :date, :message)');
+$stmt->bindValue(':title', $title);
+$stmt->bindValue(':date', $date);
+$stmt->bindValue(':message', $message);
+$stmt->execute();
+
+
+?>
+
+
 <?php require __DIR__ . '/view/header.view.php'; ?>
 <h1 class="main-heading">New Entry</h1>
 
-<form method="POST" action="form.html">
+<form method="POST" action="form.php">
     <div class="form-group">
         <label class="from-group__label" for="title">Title:</label>
         <input class="from-group__input" type="text" id="title" name="title" />
